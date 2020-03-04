@@ -9,7 +9,6 @@ public class ActorCtrl extends FilmDBDriver {
     }
 
     private int getPersonNr(String actorName) {
-        ArrayList<String> roles = new ArrayList<>();
         String personNrSQL = "SELECT PersonNr FROM Skuespiller NATURAL JOIN Person WHERE Person.Navn='"+actorName+"'";
         try {
             ResultSet set = connection.createStatement().executeQuery(personNrSQL);

@@ -8,7 +8,7 @@ public class FilmDBDriver {
 
     // Credentials
     private static final String USER = "root";
-    private static final String PASSWORD = "6wC9L8#ujrW9LeQTwJ*X";
+    private static final String PASSWORD = "6wC9L8#ujrW9LeQTwJ*X"; // Må endres til personlig passord
 
     // Connection saved
     protected Connection connection;
@@ -29,27 +29,6 @@ public class FilmDBDriver {
             e.printStackTrace();
         }
         finally {
-
-        }
-    }
-
-    public static void main(String[] args) {
-        Statement statement = null;
-        FilmDBDriver driver = new FilmDBDriver();
-        driver.connect();
-        try {
-            statement = driver.connection.createStatement();
-            String sql = "SELECT * FROM bruker";
-            ResultSet result = statement.executeQuery(sql);
-
-            while (result.next()) {
-                int brukerID = result.getInt("BrukerID");
-                String brukerNavn = result.getString("Navn");
-
-                System.out.println(brukerID + brukerNavn);
-            }
-        }
-        catch (Exception e) {
 
         }
     }
