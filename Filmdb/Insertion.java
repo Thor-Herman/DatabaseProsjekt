@@ -9,18 +9,27 @@ public class Insertion extends FilmDBDriver {
         super.connect();
     }
 
-    private int getLatestVideoID() {
-        int videoID = -1;
-        String idQuery = "SELECT VideoID FROM Video ORDER BY VideoID DESC LIMIT 1";
+    private int executeLatestIDQuery(String idQuery, String columnName) {
+        int id = -1;
         try {
             ResultSet set = connection.createStatement().executeQuery(idQuery);
             if (set.next())
-                videoID = set.getInt("VideoID");
+                id = set.getInt(columnName);
         }
         catch (SQLException e){
-            System.out.println("DB error when retrieving latest videoID");
+            System.out.println("DB error when retrieving latest " + columnName);
         }
-        return videoID;
+        return id;
+    }
+
+    private int getLatestVideoID() {
+        String idQuery = "SELECT VideoID FROM Video ORDER BY VideoID DESC LIMIT 1";
+        return executeLatestIDQuery(idQuery, "VideoID");
+    }
+
+    private int getLatestPersonID() {
+        String idQuery = "SELECT PersonNr FROM Person ORDER BY PersonNr DESC LIMIT 1";
+        return executeLatestIDQuery(idQuery, "PersonNr");
     }
 
     public int insertVideoIntoDB(String title, String description, String date, int companyID, String videoType) {
@@ -59,12 +68,25 @@ public class Insertion extends FilmDBDriver {
         }
     }
 
-    public void insert
+    public void insertPersonIntoDB(String name) {
+        String nameQuery = "INSERT INTO Person (Navn) " +
+                "VALUES (?)";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(nameQuery);
+            preparedStatement.setString(1,name);
+        } catch (SQLException e) {
+            System.out.println("Db error when inserting person into db");
+        }
+    }
+
+    public void addRoleToPerson(String role, int personNr) {
+
+    }
 
     public static void main(String[] args) {
         Insertion insrt = new Insertion();
-        System.out.println(insrt.getLatestVideoID());
-        insrt.insertFilmIntoDB(120, 2004, 2);
+        System.out.println(insrt.getLatestPersonID());
+        //insrt.insertFilmIntoDB(120, 2004, 2);
         //insrt.insertVideoIntoDB("The Room", "I did naht hit her", "2004-03-01", 1, "Kino");
     }
 
