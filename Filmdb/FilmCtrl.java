@@ -41,14 +41,14 @@ public class FilmCtrl extends FilmDBDriver {
         for (String row : genreList) {
             String[] rowArr = row.split(",");
             System.out.print("Genre: " + rowArr[0]);
-            System.out.print("CompanyID: " + rowArr[1]);
-            System.out.println("Amount of films in genre: " + rowArr[2]);
+            System.out.print(" | CompanyID: " + rowArr[1]);
+            System.out.println(" | Amount of films in genre: " + rowArr[2]);
         }
     }
 
     public static void main(String[] args) {
         FilmCtrl filmCtrl = new FilmCtrl();
-        System.out.println(filmCtrl.getCompaniesMostFilmsPerGenre());
+        filmCtrl.printCompaniesMostFilmsPerGenre();
     }
 
 }
