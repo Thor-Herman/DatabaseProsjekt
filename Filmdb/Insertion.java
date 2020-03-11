@@ -14,7 +14,8 @@ public class Insertion extends FilmDBDriver {
         String idQuery = "SELECT VideoID FROM Video ORDER BY VideoID DESC LIMIT 1";
         try {
             ResultSet set = connection.createStatement().executeQuery(idQuery);
-            videoID = set.getInt("VideoID");
+            if (set.next())
+                videoID = set.getInt("VideoID");
         }
         catch (SQLException e){
             System.out.println("DB error when retrieving latest videoID");
@@ -22,7 +23,7 @@ public class Insertion extends FilmDBDriver {
         return videoID;
     }
 
-    public int insertVideoIntoDB(String title, String description, Date date, int companyID, String videoType) {
+    public int insertVideoIntoDB(String title, String description, String date, int companyID, String videoType) {
         // Videotype needs to be one of the three
         String insertQuery = "INSERT INTO Video (Tittel, Beskrivelse, Lansdato, SelskapID, Videotype) " +
                 "VALUES (?, ?, ?, ?, ?)";
@@ -30,7 +31,7 @@ public class Insertion extends FilmDBDriver {
             PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
             preparedStatement.setString(1, title);
             preparedStatement.setString(2, description);
-            preparedStatement.setDate(3, date);
+            preparedStatement.setString(3, date);
             preparedStatement.setInt(4, companyID);
             preparedStatement.setString(5, videoType);
             preparedStatement.execute();
@@ -58,10 +59,13 @@ public class Insertion extends FilmDBDriver {
         }
     }
 
+    public void insert
+
     public static void main(String[] args) {
-        java.sql.Date date = new java.sql.Date(new java.util.Date(1999, 10, 30).getTime());
         Insertion insrt = new Insertion();
-        insrt.insertVideoIntoDB("The Room", "I did naht hit her", date, 1, "Mafia-thriller");
+        System.out.println(insrt.getLatestVideoID());
+        insrt.insertFilmIntoDB(120, 2004, 2);
+        //insrt.insertVideoIntoDB("The Room", "I did naht hit her", "2004-03-01", 1, "Kino");
     }
 
 }
