@@ -22,17 +22,17 @@ public class Insertion extends FilmDBDriver {
         return videoID;
     }
 
-    public int insertVideoIntoDB(String title, int companyID, String videoType, int length, int releaseYear) {
+    public int insertVideoIntoDB(String title, String description, Date date, int companyID, String videoType) {
         // Videotype needs to be one of the three
         String insertQuery = "INSERT INTO Video (Tittel, Beskrivelse, Lansdato, SelskapID, Videotype) " +
                 "VALUES (?, ?, ?, ?, ?)";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
             preparedStatement.setString(1, title);
-            preparedStatement.setInt(2, companyID);
-            preparedStatement.setString(3, videoType);
-            preparedStatement.setInt(4, length);
-            preparedStatement.setInt(5, releaseYear);
+            preparedStatement.setString(2, description);
+            preparedStatement.setDate(3, date);
+            preparedStatement.setInt(4, companyID);
+            preparedStatement.setString(5, videoType);
             preparedStatement.execute();
             preparedStatement.close();
         }
@@ -52,7 +52,6 @@ public class Insertion extends FilmDBDriver {
             preparedStatement.setInt(2, releaseYear);
             preparedStatement.setInt(3, videoID);
             preparedStatement.execute();
-            preparedStatement.close();
         }
         catch (SQLException e) {
             System.out.println("Db error when inserting video into db");
@@ -61,6 +60,8 @@ public class Insertion extends FilmDBDriver {
 
     public static void main(String[] args) {
         java.sql.Date date = new java.sql.Date(new java.util.Date(1999, 10, 30).getTime());
+        Insertion insrt = new Insertion();
+        insrt.insertVideoIntoDB("The Room", "I did naht hit her", date, 1, "Mafia-thriller");
     }
 
 }
