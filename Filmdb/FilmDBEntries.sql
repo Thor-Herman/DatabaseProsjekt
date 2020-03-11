@@ -17,3 +17,4 @@ insert into Video (Tittel, Beskrivelse, Lansdato, SelskapID, Videotype) values (
 'Michael Corleone tries to resist the culture of his family,
  but can he succeed when things go wrong?', '1972-10-01', 1, 'Mafia-thriller');
 insert into SpillerI values (1, 1, 'Michael Corleone');
+insert into Film values (200, 1972, 1);

@@ -26,19 +26,6 @@ public class ActorCtrl extends FilmDBDriver {
         }
     }
 
-    private ArrayList<String> SQLToStringList(String columnName, String query) {
-        ArrayList<String> resultingList = new ArrayList<>();
-        try {
-            ResultSet resultSet = connection.createStatement().executeQuery(query);
-            while (resultSet.next()) {
-                resultingList.add(resultSet.getString(columnName));
-            }
-        }
-        catch (Exception e ) {
-            System.out.println("db error when retrieving " + columnName);
-        }
-        return resultingList;
-    }
 
     public ArrayList<String> getActorRoles(String actorName) {
         int personNr = getPersonNr(actorName);

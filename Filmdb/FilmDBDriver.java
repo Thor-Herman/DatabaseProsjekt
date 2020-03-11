@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.ArrayList;
 
 public class FilmDBDriver {
 
@@ -31,5 +32,18 @@ public class FilmDBDriver {
         finally {
 
         }
+    }
+    protected ArrayList<String> SQLToStringList(String columnName, String query) {
+        ArrayList<String> resultingList = new ArrayList<>();
+        try {
+            ResultSet resultSet = connection.createStatement().executeQuery(query);
+            while (resultSet.next()) {
+                resultingList.add(resultSet.getString(columnName));
+            }
+        }
+        catch (Exception e ) {
+            System.out.println("db error when retrieving " + columnName);
+        }
+        return resultingList;
     }
 }
