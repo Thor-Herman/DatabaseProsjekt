@@ -21,7 +21,7 @@ create table Video(
 	VideoID int not null primary key auto_increment,
     Tittel varchar(40),
     Beskrivelse varchar(300),
-    LansDato date,
+    LansDato varchar(20),
     SelskapID int not null,
 	Videotype varchar(20) not null,
     foreign key (SelskapID) references Selskap(SelskapID),
