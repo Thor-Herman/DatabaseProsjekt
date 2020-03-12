@@ -52,6 +52,12 @@ public class Main {
             int videoID = insertVideo(scanner);
             insertEpisode(videoID, scanner);
         }
+        answer = "x";
+        System.out.println("Legg til kategorier denne filmen er i. Enter for å avslutte");
+        while(! answer.equals("")) {
+            answer = scanner.nextLine();
+
+        }
     }
 
     private static void printActorInfo(String choiceString, Scanner scanner) {
@@ -167,6 +173,12 @@ public class Main {
         }
     }
 
+    private void insertGenre(Scanner scanner) {
+        System.out.println("Write the name of the genre you want to create");
+        String genre = scanner.nextLine();
+        DBinserter.ins
+    }
+
     private void createUser(Scanner scanner) {
         if (! this.hasAlreadyRegisteredUser) {
             System.out.println("Skriv inn ønsket brukernavn:");
@@ -199,13 +211,18 @@ public class Main {
     }
 
     private static void addRoleToVideo(Scanner scanner) {
-        System.out.println("Skriv inn rollen: ");
+        System.out.println("Skriv inn rollen (skuespiller/regissør/forfatter): ");
         String role = scanner.nextLine();
+        String actorRole = "";
+        if (role.toLowerCase().equals("skuespiller")) {
+            System.out.println("Skriv inn rollen til skuespiller");
+            actorRole = scanner.nextLine();
+        }
         System.out.println("Skriv inn personnummeret: ");
         int personNr = stringInputToInteger(scanner.nextLine());
         System.out.println("Skriv inn videoID: ");
         int videoID = stringInputToInteger(scanner.nextLine());
-        DBinserter.addRoleToVideo(role, personNr, videoID);
+        DBinserter.addRoleToVideo(role, personNr, videoID, actorRole);
     }
 
     private static void insertUser(Scanner scanner) {
