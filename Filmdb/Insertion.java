@@ -82,10 +82,16 @@ public class Insertion extends FilmDBDriver {
         }
     }
 
-    private void createSingleIntQuery(String query, int columnValue) {
+    private void createIntQuery(String query, int[] columnValues, int columnAmounts) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, columnValue);
+            if (columnAmounts < 1)
+                throw new IllegalArgumentException("Column amount must be at least 1");
+            else if (columnAmounts != columnValues.length)
+                throw new IllegalArgumentException("Column amount must be equal to length of column values");
+            for (int i = 0; i < columnValues.length; i++) {
+                preparedStatement.setInt(i+1, columnValues[i]);
+            }
             preparedStatement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -97,19 +103,19 @@ public class Insertion extends FilmDBDriver {
         switch (role.toLowerCase()) {
             case "forfatter":
                 if (isVerb)
-                    roleQuery = "INSERT INTO forfatter VALUES(?)";
+                    roleQuery = "INSERT INTO skrevetmanus VALUES(?,?)";
                 else
                     roleQuery = "INSERT INTO forfatter VALUES(?)";
                 break;
             case "regissør":
                 if (isVerb)
-                    roleQuery = "INSERT INTO regisserer VALUES(?)";
+                    roleQuery = "INSERT INTO regisserer VALUES(?,?)";
                 else
                     roleQuery = "INSERT INTO regissør VALUES(?)";
                 break;
             case "skuespiller":
                 if (isVerb)
-                    roleQuery = "INSERT INTO spilleri VALUES(?)";
+                    roleQuery = "INSERT INTO spilleri VALUES(?,?)";
                 else
                     roleQuery = "INSERT INTO skuespiller VALUES(?)";
                 break;
@@ -124,7 +130,8 @@ public class Insertion extends FilmDBDriver {
         }
         if (! personHasRole(role, personNr)) {
             String roleQuery = determineRoleQuery(role, false);
-            createSingleIntQuery(roleQuery, personNr);
+            int[] roles = {personNr};
+            createIntQuery(roleQuery, roles, 1);
         }
         else {
             System.out.println("Person already has that role");
@@ -132,7 +139,12 @@ public class Insertion extends FilmDBDriver {
     }
 
     private boolean personHasRole(String role, int personNr) {
-        String roleQuery = "SELECT * FROM Person NATURAL JOIN '"+role+"' WHERE PersonNr ='"+personNr+"'";
+        StringBuffer roleQueryBuff = new StringBuffer();
+        roleQueryBuff.append("SELECT * FROM Person NATURAL JOIN ");
+        roleQueryBuff.append(role);
+        roleQueryBuff.append(" WHERE PersonNr =");
+        roleQueryBuff.append(personNr);
+        String roleQuery = roleQueryBuff.toString();
         try {
             ResultSet set = connection.createStatement().executeQuery(roleQuery);
             return set.next();
@@ -152,16 +164,18 @@ public class Insertion extends FilmDBDriver {
             System.out.println("Added role " + role + " to this person");
         }
         String roleQuery = determineRoleQuery(role, true);
-        createSingleIntQuery(roleQuery, videoID);
+        int[] foreignKeys = {personNr, videoID};
+        createIntQuery(roleQuery, foreignKeys, 2);
     }
 
     public static void main(String[] args) {
         Insertion insrt = new Insertion();
         System.out.println(insrt.getLatestPersonID());
-        //insrt.insertFilmIntoDB(120, 2004, 2);
-        //insrt.insertVideoIntoDB("The Room", "I did naht hit her", "2004-03-01", 1, "Kino");
-        //insrt.insertPersonIntoDB("Hallvard Trætteberg");
+        insrt.insertVideoIntoDB("The Room", "I did naht hit her", "2004-03-01", 1, "Kino");
+        insrt.insertFilmIntoDB(120, 2004, 2);
+        insrt.insertPersonIntoDB("Hallvard Trætteberg");
         insrt.addRoleToPerson("Forfatter", 2);
+        insrt.addRoleToVideo("forfatter", 2, 1);
     }
 
 }
