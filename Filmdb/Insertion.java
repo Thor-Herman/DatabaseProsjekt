@@ -259,6 +259,27 @@ public class Insertion extends FilmDBDriver {
         createIntQuery(roleQuery, foreignKeys);
     }
 
+    public void addRatingToEpisode(int userID, int episodeID, int rating) {
+        if (rating < 11 && rating > 0) {
+            if (checkUserExists(userID)) {
+                if (checkEpisodeExists(episodeID)) {
+                    String ratingQuery = "INSERT INTO VurdertEpisode VALUES (?,?,?)";
+                    int[] ratingValues = {userID, episodeID, rating};
+                    createIntQuery(ratingQuery, ratingValues);
+                }
+                else {
+                    System.out.println("Episode not found");
+                }
+            }
+            else {
+                System.out.println("User not found");
+            }
+        }
+        else {
+            System.out.println("Rating must be between 1-10");
+        }
+    }
+
     public static void main(String[] args) {
         Insertion insrt = new Insertion();
         System.out.println(insrt.getLatestPersonID());
@@ -271,7 +292,8 @@ public class Insertion extends FilmDBDriver {
 //        insrt.insertSeriesIntoDB(2);
 //        System.out.println(insrt.checkSeriesExists(2));
 //        insrt.insertEpisodeIntoDB(1, 2005, 1, "Tommy returns", "Hallo", 2);
-        insrt.insertUserIntoDB("T-H");
+//        insrt.insertUserIntoDB("T-H");
+        insrt.addRatingToEpisode(4,1,9);
     }
 
 }
