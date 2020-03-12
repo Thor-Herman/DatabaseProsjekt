@@ -32,6 +32,9 @@ public class Main {
                 insertPerson(lineScanner);
             if (inputString.equals("h"))
                 addRoleToVideo(lineScanner);
+            if (inputString.equals("i")) {
+                insertCompany(lineScanner);
+            }
         }
         lineScanner.close();
     }
@@ -75,6 +78,7 @@ public class Main {
         System.out.println("f: Lage en ny bruker og logg inn");
         System.out.println("g: Legge til en ny person i databasen");
         System.out.println("h: Legge til roller i en film");
+        System.out.println("i: Legge til et selskap");
         System.out.println("q: Exit programmet");
         System.out.println("Skriv inn bokstaven foran det valget du ønsker å ta:  ");
     }
