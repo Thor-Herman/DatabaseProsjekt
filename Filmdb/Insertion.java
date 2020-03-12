@@ -25,6 +25,55 @@ public class Insertion extends FilmDBDriver {
         return id;
     }
 
+    private void createIntQuery(String query, int[] columnValues) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            if (columnValues.length < 1)
+                throw new IllegalArgumentException("Column amount must be at least 1");
+            for (int i = 0; i < columnValues.length; i++) {
+                preparedStatement.setInt(i+1, columnValues[i]);
+            }
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private boolean checkExistenceInTable(String[] tables, String identifier, int id) {
+        // Tables = tabeller som skal joines
+        // Identifier = Navn til ID
+        // id = faktisk id-verdi
+        StringBuffer queryBuff = new StringBuffer();
+        queryBuff.append("SELECT * FROM ");
+        queryBuff.append(tables[0]);
+        for (int i = 1; i < tables.length; i++) {
+            queryBuff.append(" NATURAL JOIN ");
+            queryBuff.append(tables[i]);
+        }
+        queryBuff.append(" WHERE ");
+        queryBuff.append(identifier);
+        queryBuff.append("=");
+        queryBuff.append(id);
+        String roleQuery = queryBuff.toString();
+        try {
+            ResultSet set = connection.createStatement().executeQuery(roleQuery);
+            return set.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private boolean personHasRole(String role, int personNr) {
+        String[] roles = {role};
+        return checkExistenceInTable(roles, "PersonNr", personNr);
+    }
+
+    private boolean episodeHasSeries(int serieID) {
+        String[] series = {"serie"};
+        return checkExistenceInTable(series, "videoid", serieID );
+    }
+
     private int getLatestCompanyID() {
         String idQuery = "SELECT SelskapID FROM Selskap ORDER BY SelskapID DESC LIMIT 1";
         return executeLatestIDQuery(idQuery, "SelskapID");
@@ -92,6 +141,38 @@ public class Insertion extends FilmDBDriver {
         }
     }
 
+    public void insertSeriesIntoDB(int videoID) {
+        String query = "INSERT INTO Serie VALUES (?)";
+        int[] videoArray = {videoID};
+        createIntQuery(query, videoArray);
+    }
+
+    public void insertEpisodeIntoDB(int episodeNr, int relYear, int season, String title, String descr, int videoID) {
+        if (episodeHasSeries(videoID)) {
+            if (title.equals("")) {
+                System.out.println("Episodes must have a title");
+                return;
+            }
+            String episodeSQL = "INSERT INTO episode (EpisodeNr, UtgÅr, Sesong, Tittel, Beskrivelse, VideoID)" +
+                                "VALUES (?,?,?,?,?,?)";
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(episodeSQL);
+                preparedStatement.setInt(1, episodeNr);
+                preparedStatement.setInt(2, relYear);
+                preparedStatement.setInt(3, season);
+                preparedStatement.setString(4, title);
+                preparedStatement.setString(5, descr);
+                preparedStatement.setInt(6, videoID);
+                preparedStatement.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            System.out.println("There is no series corresponding to the videoID");
+        }
+    }
+
     public void insertPersonIntoDB(String name) {
         String nameQuery = "INSERT INTO Person (Navn) " +
                 "VALUES (?)";
@@ -101,22 +182,6 @@ public class Insertion extends FilmDBDriver {
             preparedStatement.execute();
         } catch (SQLException e) {
             System.out.println("Db error when inserting person into db");
-        }
-    }
-
-    private void createIntQuery(String query, int[] columnValues, int columnAmounts) {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            if (columnAmounts < 1)
-                throw new IllegalArgumentException("Column amount must be at least 1");
-            else if (columnAmounts != columnValues.length)
-                throw new IllegalArgumentException("Column amount must be equal to length of column values");
-            for (int i = 0; i < columnValues.length; i++) {
-                preparedStatement.setInt(i+1, columnValues[i]);
-            }
-            preparedStatement.execute();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 
@@ -153,26 +218,10 @@ public class Insertion extends FilmDBDriver {
         if (! personHasRole(role, personNr)) {
             String roleQuery = determineRoleQuery(role, false);
             int[] roles = {personNr};
-            createIntQuery(roleQuery, roles, 1);
+            createIntQuery(roleQuery, roles);
         }
         else {
             System.out.println("Person already has that role");
-        }
-    }
-
-    private boolean personHasRole(String role, int personNr) {
-        StringBuffer roleQueryBuff = new StringBuffer();
-        roleQueryBuff.append("SELECT * FROM Person NATURAL JOIN ");
-        roleQueryBuff.append(role);
-        roleQueryBuff.append(" WHERE PersonNr =");
-        roleQueryBuff.append(personNr);
-        String roleQuery = roleQueryBuff.toString();
-        try {
-            ResultSet set = connection.createStatement().executeQuery(roleQuery);
-            return set.next();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
         }
     }
 
@@ -187,20 +236,21 @@ public class Insertion extends FilmDBDriver {
         }
         String roleQuery = determineRoleQuery(role, true);
         int[] foreignKeys = {personNr, videoID};
-        createIntQuery(roleQuery, foreignKeys, 2);
+        createIntQuery(roleQuery, foreignKeys);
     }
 
     public static void main(String[] args) {
         Insertion insrt = new Insertion();
         System.out.println(insrt.getLatestPersonID());
-        /*
         insrt.insertVideoIntoDB("The Room", "I did naht hit her", "2004-03-01", 1, "Kino");
         insrt.insertFilmIntoDB(120, 2004, 2);
         insrt.insertPersonIntoDB("Hallvard Trætteberg");
         insrt.addRoleToPerson("Forfatter", 2);
         insrt.addRoleToVideo("forfatter", 2, 1);
-        */
         insrt.insertCompanyIntoDb("Norge", "Oslo", "www.norskfilm.no");
+        insrt.insertSeriesIntoDB(2);
+        System.out.println(insrt.episodeHasSeries(2));
+        insrt.insertEpisodeIntoDB(1, 2005, 1, "Tommy returns", "Hallo", 2);
     }
 
 }
