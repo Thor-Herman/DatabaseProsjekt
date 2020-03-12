@@ -98,6 +98,11 @@ public class Insertion extends FilmDBDriver {
         return executeLatestIDQuery(idQuery, "PersonNr");
     }
 
+    private int getLatestUserID() {
+        String idQuery = "SELECT BrukerID FROM Bruker ORDER BY BrukerID DESC LIMIT 1";
+        return executeLatestIDQuery(idQuery, "BrukerID");
+    }
+
     public int insertCompanyIntoDb(String country, String address, String url) {
         String insertQuery = "INSERT INTO selskap (Land, Addresse, URL) " +
                              "VALUES (?, ?, ?)";
@@ -182,7 +187,7 @@ public class Insertion extends FilmDBDriver {
         }
     }
 
-    public void insertUserIntoDB(String name) {
+    public int insertUserIntoDB(String name) {
         String userQuery = "INSERT INTO bruker (Navn) VALUES (?)";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(userQuery);
@@ -190,7 +195,9 @@ public class Insertion extends FilmDBDriver {
             preparedStatement.execute();
         } catch (SQLException e) {
             System.out.println("Error while inserting user into db. May already exist");
+            return -1;
         }
+        return getLatestUserID();
     }
 
     public void insertPersonIntoDB(String name) {

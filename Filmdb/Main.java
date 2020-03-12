@@ -4,8 +4,14 @@ public class Main {
     private static ActorCtrl actorCtrl = new ActorCtrl();
     private static FilmCtrl filmCtrl = new FilmCtrl();
     private static Insertion DBinserter = new Insertion();
+
+    // Antar at for hver main kan man bare opprette én bruker
+    private boolean hasAlreadyRegisteredUser = false;
+    private int userID;
+
     // Runs a text interface in the console
     public static void main(String[] args) {
+        Main main = new Main(); // To avoid static
         String inputString = "";
         System.out.println("Velkommen til vår IMDB, vennligst velg et av alternative under: ");
         Scanner lineScanner = new Scanner(System.in);
@@ -21,6 +27,12 @@ public class Main {
             }
             if (inputString.equals("d")) {
                 insertMovieorSeriesorEpisode(lineScanner);
+            }
+            if (inputString.equals("f")) {
+                main.createUser(lineScanner);
+            }
+            if (inputString.equals("g")) {
+                main.insertRating(lineScanner);
             }
         }
         lineScanner.close();
@@ -126,6 +138,31 @@ public class Main {
         System.out.println("Skriv inn en beskrivelse av episoden: ");
         String description = scanner.nextLine();
         DBinserter.insertEpisodeIntoDB(episodeNr, releaseYear, season, title, description, videoID);
+    }
+
+    private void insertRating(Scanner scanner) {
+        System.out.println("Skriv inn rating 1-10");
+        int rating = stringInputToInteger(scanner.nextLine());
+        if (rating < 11 && rating > 0) {
+            System.out.println("Skriv inn episodeID");
+            int epID = stringInputToInteger(scanner.nextLine());
+            DBinserter.addRatingToEpisode(this.userID, epID, rating);
+        }
+        else {
+            System.out.println("Rating var ikke mellom 1 og 10. Prøv igjen");
+        }
+    }
+
+    private void createUser(Scanner scanner) {
+        if (! this.hasAlreadyRegisteredUser) {
+            System.out.println("Skriv inn ønsket brukernavn:");
+            String name = scanner.nextLine();
+            this.userID = DBinserter.insertUserIntoDB(name);
+            this.hasAlreadyRegisteredUser = true;
+        }
+        else {
+            System.out.println("Du har alt registrert en bruker");
+        }
     }
 
     // Validates strings containing numbers, integers and underscores
