@@ -28,12 +28,12 @@ public class Main {
             if (inputString.equals("d")) {
                 insertMovieorSeriesorEpisode(lineScanner);
             }
-            if (inputString.equals("f")) {
-                main.createUser(lineScanner);
-            }
-            if (inputString.equals("g")) {
+            if (inputString.equals("e"))
                 main.insertRating(lineScanner);
-            }
+            if (inputString.equals("f"))
+                main.createUser(lineScanner);
+            if (inputString.equals("g"))
+                insertPerson(lineScanner);
         }
         lineScanner.close();
     }
@@ -119,7 +119,12 @@ public class Main {
     private static void insertPerson(Scanner scanner) {
         System.out.println("Skriv inn navnet til personen du vil legge inn: ");
         String personName = scanner.nextLine();
-        DBinserter.insertPersonIntoDB(personName);
+        int personID = DBinserter.insertPersonIntoDB(personName);
+        String roleName = "x";
+        while (! roleName.equals("")) {
+            roleName = addRoleToPerson(scanner, personID);
+        }
+        System.out.println("Person lagt til");
     }
 
     private static void insertSeries(int videoID) {
@@ -141,15 +146,19 @@ public class Main {
     }
 
     private void insertRating(Scanner scanner) {
-        System.out.println("Skriv inn rating 1-10");
-        int rating = stringInputToInteger(scanner.nextLine());
-        if (rating < 11 && rating > 0) {
-            System.out.println("Skriv inn episodeID");
-            int epID = stringInputToInteger(scanner.nextLine());
-            DBinserter.addRatingToEpisode(this.userID, epID, rating);
+        if (this.hasAlreadyRegisteredUser) {
+            System.out.println("Skriv inn rating 1-10");
+            int rating = stringInputToInteger(scanner.nextLine());
+            if (rating < 11 && rating > 0) {
+                System.out.println("Skriv inn episodeID");
+                int epID = stringInputToInteger(scanner.nextLine());
+                DBinserter.addRatingToEpisode(this.userID, epID, rating);
+            } else {
+                System.out.println("Rating var ikke mellom 1 og 10. Prøv igjen");
+            }
         }
         else {
-            System.out.println("Rating var ikke mellom 1 og 10. Prøv igjen");
+            System.out.println("Register a user first");
         }
     }
 
@@ -163,6 +172,41 @@ public class Main {
         else {
             System.out.println("Du har alt registrert en bruker");
         }
+    }
+
+    private static String addRoleToPerson(Scanner scanner, int personNr) {
+        System.out.println("Skriv inn rollenavn. Enter for å avslutte: ");
+        String roleName = scanner.nextLine();
+        if (! roleName.equals("")) {
+            DBinserter.addRoleToPerson(roleName, personNr);
+        }
+        return roleName;
+    }
+
+    private static void addRatingToEpisode(Scanner scanner) {
+        System.out.println("Skriv inn brukerID: ");
+        int userID = stringInputToInteger(scanner.nextLine());
+        System.out.println("Skriv inn epsiodeID: ");
+        int episodeID = stringInputToInteger(scanner.nextLine());
+        System.out.println("Skriv inn din rating: ");
+        int rating = stringInputToInteger(scanner.nextLine());
+        DBinserter.addRatingToEpisode(userID, episodeID, rating);
+    }
+
+    private static void addRoleToVideo(Scanner scanner) {
+        System.out.println("Skriv inn rollen: ");
+        String role = scanner.nextLine();
+        System.out.println("Skriv inn personnummeret: ");
+        int personNr = stringInputToInteger(scanner.nextLine());
+        System.out.println("Skriv inn videoID: ");
+        int videoID = stringInputToInteger(scanner.nextLine());
+        DBinserter.addRoleToVideo(role, personNr, videoID);
+    }
+
+    private static void insertUser(Scanner scanner) {
+        System.out.println("Skriv inn brukernavn: ");
+        String userName = scanner.nextLine();
+        DBinserter.insertUserIntoDB(userName);
     }
 
     // Validates strings containing numbers, integers and underscores
