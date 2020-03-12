@@ -13,7 +13,7 @@ public class FilmCtrl extends FilmDBDriver {
         String templateSQL =
                 "SELECT Kategori.KategoriNavn, SelskapID, count(VideoID)" +
                 "FROM kategorisert NATURAL JOIN kategori NATURAL JOIN Video NATURAL JOIN FILM NATURAL JOIN SELSKAP " +
-                "GROUP BY SelskapID " +
+                "GROUP BY KategoriNavn " +
                 "ORDER BY count(VideoID) DESC " +
                 "LIMIT 1";
         try {

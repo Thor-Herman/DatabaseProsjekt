@@ -39,22 +39,25 @@ public class Main {
     private static void insertMovieorSeriesorEpisode(Scanner scanner) {
         System.out.println("Skriv 'a' for å sette inn en film, 'b' for serie og 'c' for episode");
         String answer = scanner.nextLine();
+        int videoID = -1;
         if (answer.equals("a")) {
-            int videoID = insertVideo(scanner);
+            videoID = insertVideo(scanner);
             insertFilm(videoID, scanner);
         } else if (answer.equals("b")) {
-            int videoID = insertVideo(scanner);
+            videoID = insertVideo(scanner);
             insertSeries(videoID);
         } else if (answer.equals("c")) {
-            int videoID = insertVideo(scanner);
+            videoID = insertVideo(scanner);
             insertEpisode(videoID, scanner);
         }
         answer = "x";
         System.out.println("Legg til kategorier denne filmen er i. Enter for å avslutte");
         while(! answer.equals("")) {
-            answer = scanner.nextLine();
-
+            answer = insertGenre(scanner);
+            if (!answer.equals(""))
+                addGenreToVideo(answer, videoID);
         }
+        System.out.println("Kategorier lagt til");
     }
 
     private static void printActorInfo(String choiceString, Scanner scanner) {
@@ -169,10 +172,12 @@ public class Main {
         }
     }
 
-    private void insertGenre(Scanner scanner) {
-        System.out.println("Write the name of the genre you want to create");
+    private static String insertGenre(Scanner scanner) {
+        System.out.println("Skriv navnet på kategorien du vil legge til");
         String genre = scanner.nextLine();
-        DBinserter.ins
+        if (genre.equals("")) return "";
+        DBinserter.insertGenreIntoDB(genre);
+        return genre;
     }
 
     private void createUser(Scanner scanner) {
@@ -219,6 +224,10 @@ public class Main {
         System.out.println("Skriv inn videoID: ");
         int videoID = stringInputToInteger(scanner.nextLine());
         DBinserter.addRoleToVideo(role, personNr, videoID, actorRole);
+    }
+
+    private static void addGenreToVideo(String name, int videoID) {
+        DBinserter.addGenreToVideo(name, videoID);
     }
 
     private static void insertUser(Scanner scanner) {

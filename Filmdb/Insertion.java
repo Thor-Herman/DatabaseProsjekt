@@ -203,16 +203,28 @@ public class Insertion extends FilmDBDriver {
     public int insertPersonIntoDB(String name) {
         String nameQuery = "INSERT INTO Person (Navn) " +
                 "VALUES (?)";
+        if (executeSingleNameQuery(name, nameQuery)) return -1;
+        return getLatestPersonID();
+    }
+
+    public void insertGenreIntoDB(String name) {
+        String nameQuery = "INSERT INTO Kategori (KategoriNavn) " +
+                "VALUES (?)";
+        executeSingleNameQuery(name, nameQuery);
+    }
+
+    private boolean executeSingleNameQuery(String name, String nameQuery) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(nameQuery);
             preparedStatement.setString(1,name);
             preparedStatement.execute();
         } catch (SQLException e) {
             System.out.println("Db error when inserting person into db");
-            return -1;
+            return true;
         }
-        return getLatestPersonID();
+        return false;
     }
+
 
     private String determineRoleQuery(String role, boolean isVerb) {
         String roleQuery = "";
@@ -299,6 +311,18 @@ public class Insertion extends FilmDBDriver {
         }
         else {
             System.out.println("Rating must be between 1-10");
+        }
+    }
+
+    public void addGenreToVideo(String genreName, int videoID) {
+        String genreInsertQuery = "INSERT INTO Kategorisert VALUES (?,?)";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(genreInsertQuery);
+            preparedStatement.setString(1, genreName);
+            preparedStatement.setInt(2, videoID);
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
