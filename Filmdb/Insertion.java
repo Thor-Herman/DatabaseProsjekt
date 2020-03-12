@@ -1,4 +1,3 @@
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -83,31 +82,77 @@ public class Insertion extends FilmDBDriver {
         }
     }
 
+    private void createSingleIntQuery(String query, int columnValue) {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, columnValue);
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String determineRoleQuery(String role, boolean isVerb) {
+        String roleQuery = "";
+        switch (role.toLowerCase()) {
+            case "forfatter":
+                if (isVerb)
+                    roleQuery = "INSERT INTO forfatter VALUES(?)";
+                else
+                    roleQuery = "INSERT INTO forfatter VALUES(?)";
+                break;
+            case "regissør":
+                if (isVerb)
+                    roleQuery = "INSERT INTO regisserer VALUES(?)";
+                else
+                    roleQuery = "INSERT INTO regissør VALUES(?)";
+                break;
+            case "skuespiller":
+                if (isVerb)
+                    roleQuery = "INSERT INTO spilleri VALUES(?)";
+                else
+                    roleQuery = "INSERT INTO skuespiller VALUES(?)";
+                break;
+        }
+        return roleQuery;
+    }
+
     public void addRoleToPerson(String role, int personNr) {
         if (Arrays.stream(acceptableRoles).noneMatch(
                 acceptableRole -> acceptableRole.toLowerCase().equals(role.toLowerCase()))) {
             System.out.println(role + " is not an acceptable role");
         }
-        String roleQuery = "";
-        switch (role.toLowerCase()) {
-            case "forfatter":
-                roleQuery = "INSERT INTO forfatter VALUES(?)";
-                break;
-            case "regissør":
-                roleQuery = "INSERT INTO regissør VALUES(?)";
-                break;
-            case "skuespiller":
-                roleQuery = "INSERT INTO skuespiller VALUES(?)";
-                break;
+        if (! personHasRole(role, personNr)) {
+            String roleQuery = determineRoleQuery(role, false);
+            createSingleIntQuery(roleQuery, personNr);
         }
+        else {
+            System.out.println("Person already has that role");
+        }
+    }
+
+    private boolean personHasRole(String role, int personNr) {
+        String roleQuery = "SELECT * FROM Person NATURAL JOIN '"+role+"' WHERE PersonNr ='"+personNr+"'";
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(roleQuery);
-            preparedStatement.setInt(1, personNr);
-            preparedStatement.execute();
+            ResultSet set = connection.createStatement().executeQuery(roleQuery);
+            return set.next();
         } catch (SQLException e) {
-            System.out.println("Db error when adding role to a person. Person may not exist or they" +
-                    "may already have that role");;
+            e.printStackTrace();
+            return false;
         }
+    }
+
+    public void addRoleToVideo(String role, int personNr, int videoID) {
+        if (Arrays.stream(acceptableRoles).noneMatch(
+                acceptableRoleVerb -> acceptableRoleVerb.toLowerCase().equals(role.toLowerCase()))) {
+            System.out.println(role + " is not an acceptable roleVerb");
+        }
+        if (! personHasRole(role, personNr)) {
+            addRoleToPerson(role, personNr);
+            System.out.println("Added role " + role + " to this person");
+        }
+        String roleQuery = determineRoleQuery(role, true);
+        createSingleIntQuery(roleQuery, videoID);
     }
 
     public static void main(String[] args) {
