@@ -3,6 +3,7 @@ alter table selskap auto_increment = 1;
 alter table video auto_increment = 1;
 alter table person auto_increment = 1;
 alter table bruker auto_increment = 1;
+alter table episode auto_increment = 1;
 
 insert into bruker (Navn) values ('Per');
 insert into bruker (Navn) values ('Ole');

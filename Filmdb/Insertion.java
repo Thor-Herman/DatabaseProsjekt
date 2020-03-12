@@ -1,4 +1,3 @@
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -64,14 +63,24 @@ public class Insertion extends FilmDBDriver {
         }
     }
 
-    private boolean personHasRole(String role, int personNr) {
+    private boolean checkPersonHasRole(String role, int personNr) {
         String[] roles = {role};
         return checkExistenceInTable(roles, "PersonNr", personNr);
     }
 
-    private boolean episodeHasSeries(int serieID) {
+    private boolean checkSeriesExists(int serieID) {
         String[] series = {"serie"};
         return checkExistenceInTable(series, "videoid", serieID );
+    }
+
+    private boolean checkEpisodeExists(int epID) {
+        String[] episode = {"episode"};
+        return checkExistenceInTable(episode, "episodeid", epID);
+    }
+
+    private boolean checkUserExists(int userID) {
+        String[] user = {"bruker"};
+        return checkExistenceInTable(user, "brukerid", userID);
     }
 
     private int getLatestCompanyID() {
@@ -148,7 +157,7 @@ public class Insertion extends FilmDBDriver {
     }
 
     public void insertEpisodeIntoDB(int episodeNr, int relYear, int season, String title, String descr, int videoID) {
-        if (episodeHasSeries(videoID)) {
+        if (checkSeriesExists(videoID)) {
             if (title.equals("")) {
                 System.out.println("Episodes must have a title");
                 return;
@@ -170,6 +179,17 @@ public class Insertion extends FilmDBDriver {
         }
         else {
             System.out.println("There is no series corresponding to the videoID");
+        }
+    }
+
+    public void insertUserIntoDB(String name) {
+        String userQuery = "INSERT INTO bruker (Navn) VALUES (?)";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(userQuery);
+            preparedStatement.setString(1, name);
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            System.out.println("Error while inserting user into db. May already exist");
         }
     }
 
@@ -215,7 +235,7 @@ public class Insertion extends FilmDBDriver {
                 acceptableRole -> acceptableRole.toLowerCase().equals(role.toLowerCase()))) {
             System.out.println(role + " is not an acceptable role");
         }
-        if (! personHasRole(role, personNr)) {
+        if (! checkPersonHasRole(role, personNr)) {
             String roleQuery = determineRoleQuery(role, false);
             int[] roles = {personNr};
             createIntQuery(roleQuery, roles);
@@ -230,7 +250,7 @@ public class Insertion extends FilmDBDriver {
                 acceptableRoleVerb -> acceptableRoleVerb.toLowerCase().equals(role.toLowerCase()))) {
             System.out.println(role + " is not an acceptable roleVerb");
         }
-        if (! personHasRole(role, personNr)) {
+        if (! checkPersonHasRole(role, personNr)) {
             addRoleToPerson(role, personNr);
             System.out.println("Added role " + role + " to this person");
         }
@@ -239,18 +259,41 @@ public class Insertion extends FilmDBDriver {
         createIntQuery(roleQuery, foreignKeys);
     }
 
+    public void addRatingToEpisode(int userID, int episodeID, int rating) {
+        if (rating < 11 && rating > 0) {
+            if (checkUserExists(userID)) {
+                if (checkEpisodeExists(episodeID)) {
+                    String ratingQuery = "INSERT INTO VurdertEpisode VALUES (?,?,?)";
+                    int[] ratingValues = {userID, episodeID, rating};
+                    createIntQuery(ratingQuery, ratingValues);
+                }
+                else {
+                    System.out.println("Episode not found");
+                }
+            }
+            else {
+                System.out.println("User not found");
+            }
+        }
+        else {
+            System.out.println("Rating must be between 1-10");
+        }
+    }
+
     public static void main(String[] args) {
         Insertion insrt = new Insertion();
         System.out.println(insrt.getLatestPersonID());
-        insrt.insertVideoIntoDB("The Room", "I did naht hit her", "2004-03-01", 1, "Kino");
-        insrt.insertFilmIntoDB(120, 2004, 2);
-        insrt.insertPersonIntoDB("Hallvard Trætteberg");
-        insrt.addRoleToPerson("Forfatter", 2);
-        insrt.addRoleToVideo("forfatter", 2, 1);
-        insrt.insertCompanyIntoDb("Norge", "Oslo", "www.norskfilm.no");
-        insrt.insertSeriesIntoDB(2);
-        System.out.println(insrt.episodeHasSeries(2));
-        insrt.insertEpisodeIntoDB(1, 2005, 1, "Tommy returns", "Hallo", 2);
+//        insrt.insertVideoIntoDB("The Room", "I did naht hit her", "2004-03-01", 1, "Kino");
+//        insrt.insertFilmIntoDB(120, 2004, 2);
+//        insrt.insertPersonIntoDB("Hallvard Trætteberg");
+//        insrt.addRoleToPerson("Forfatter", 2);
+//        insrt.addRoleToVideo("forfatter", 2, 1);
+//        insrt.insertCompanyIntoDb("Norge", "Oslo", "www.norskfilm.no");
+//        insrt.insertSeriesIntoDB(2);
+//        System.out.println(insrt.checkSeriesExists(2));
+//        insrt.insertEpisodeIntoDB(1, 2005, 1, "Tommy returns", "Hallo", 2);
+//        insrt.insertUserIntoDB("T-H");
+        insrt.addRatingToEpisode(4,1,9);
     }
 
 }
