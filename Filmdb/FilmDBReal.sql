@@ -60,7 +60,7 @@ create table Kategori(
 );
 
 create table Episode(
-	EpisodeID int not null primary key,
+	EpisodeID int not null primary key auto_increment,
     EpisodeNr int not null,
     UtgÅr int,
     Sesong int,
