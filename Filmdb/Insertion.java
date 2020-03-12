@@ -2,8 +2,11 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 public class Insertion extends FilmDBDriver {
+
+    private String[] acceptableRoles = {"skuespiller", "regissør", "forfatter"};
 
     public Insertion() {
         super.connect();
@@ -74,13 +77,37 @@ public class Insertion extends FilmDBDriver {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(nameQuery);
             preparedStatement.setString(1,name);
+            preparedStatement.execute();
         } catch (SQLException e) {
             System.out.println("Db error when inserting person into db");
         }
     }
 
     public void addRoleToPerson(String role, int personNr) {
-
+        if (Arrays.stream(acceptableRoles).noneMatch(
+                acceptableRole -> acceptableRole.toLowerCase().equals(role.toLowerCase()))) {
+            System.out.println(role + " is not an acceptable role");
+        }
+        String roleQuery = "";
+        switch (role.toLowerCase()) {
+            case "forfatter":
+                roleQuery = "INSERT INTO forfatter VALUES(?)";
+                break;
+            case "regissør":
+                roleQuery = "INSERT INTO regissør VALUES(?)";
+                break;
+            case "skuespiller":
+                roleQuery = "INSERT INTO skuespiller VALUES(?)";
+                break;
+        }
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(roleQuery);
+            preparedStatement.setInt(1, personNr);
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            System.out.println("Db error when adding role to a person. Person may not exist or they" +
+                    "may already have that role");;
+        }
     }
 
     public static void main(String[] args) {
@@ -88,6 +115,8 @@ public class Insertion extends FilmDBDriver {
         System.out.println(insrt.getLatestPersonID());
         //insrt.insertFilmIntoDB(120, 2004, 2);
         //insrt.insertVideoIntoDB("The Room", "I did naht hit her", "2004-03-01", 1, "Kino");
+        //insrt.insertPersonIntoDB("Hallvard Trætteberg");
+        insrt.addRoleToPerson("Forfatter", 2);
     }
 
 }
