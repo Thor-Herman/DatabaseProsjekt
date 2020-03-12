@@ -8,11 +8,10 @@ public class Main {
     public static void main(String[] args) {
         String inputString = "";
         System.out.println("Velkommen til vår IMDB, vennligst velg et av alternative under: ");
-
+        Scanner lineScanner = new Scanner(System.in);
         while (!inputString.equals("q")) {
             printMenu();
-            Scanner lineScanner = new Scanner(System.in);
-            inputString = lineScanner.next();
+            inputString = lineScanner.nextLine();
 
             if (inputString.equals("a") || inputString.equals("b")) {
                 printActorInfo(inputString);
@@ -23,14 +22,14 @@ public class Main {
             if (inputString.equals("d")) {
                 insertMovieorSeriesorEpisode();
             }
-            lineScanner.close();
         }
+        lineScanner.close();
     }
 
     private static void insertMovieorSeriesorEpisode() {
         System.out.println("Skriv 'a' for å sette inn en film, 'b' for serie og 'c' for episode");
         Scanner answerScanner = new Scanner(System.in);
-        String answer = answerScanner.next();
+        String answer = answerScanner.nextLine();
         if (answer.equals("a")) {
             int videoID = insertVideo();
             insertFilm(videoID);
@@ -46,14 +45,15 @@ public class Main {
     private static void printActorInfo(String choiceString) {
         Scanner actorScanner = new Scanner(System.in);
         System.out.println("Vennligst skriv inn the fulle navnet til skuespilleren du vil ha info om: ");
-        String actorName = actorScanner.next(); // Tar navn input fra brukeren
+        String actorName = actorScanner.nextLine(); // Tar navn input fra brukeren
         if (validateStringInput(actorName)) {
             if (choiceString.equals("a")) {
-                actorCtrl.getActorRoles(actorName);
+                System.out.println(actorCtrl.getActorRoles(actorName));
             } else {
-                actorCtrl.getActorFilms(actorName);
+                System.out.println(actorCtrl.getActorFilms(actorName));
             }
-        } else {
+        }
+        else {
             System.out.println("Vennligst skriv inn et ordentlig navn");
         }
         actorScanner.close();
@@ -72,15 +72,15 @@ public class Main {
     private static int insertVideo() {
         Scanner videoInformationScanner = new Scanner(System.in);
         System.out.println("Tittel: ");
-        String title = videoInformationScanner.next();
+        String title = videoInformationScanner.nextLine();
         System.out.println("Beskrivelse: ");
-        String description = videoInformationScanner.next();
+        String description = videoInformationScanner.nextLine();
         System.out.println("Lanseringsdato: ");
-        String releaseDate = videoInformationScanner.next();
+        String releaseDate = videoInformationScanner.nextLine();
         System.out.println("Id til selskapet");
-        String companyIDString = videoInformationScanner.next();
+        String companyIDString = videoInformationScanner.nextLine();
         System.out.println("Skriv inn hva slags type video dette er: ");
-        String videoType = videoInformationScanner.next();
+        String videoType = videoInformationScanner.nextLine();
         int companyIDInteger = stringInputToInteger(companyIDString);
         if (companyIDInteger > 0) {
             return DBinserter.insertVideoIntoDB(title, description, releaseDate, companyIDInteger, videoType);
@@ -92,11 +92,11 @@ public class Main {
     private static void insertCompany() {
         Scanner companyInformationScanner = new Scanner(System.in);
         System.out.println("Skriv inn landet til selskapet: ");
-        String country = companyInformationScanner.next();
+        String country = companyInformationScanner.nextLine();
         System.out.println("Skriv inn adressem: ");
-        String address = companyInformationScanner.next();
+        String address = companyInformationScanner.nextLine();
         System.out.println("Skriv inn urlen til nettsiden: ");
-        String url = companyInformationScanner.next();
+        String url = companyInformationScanner.nextLine();
         DBinserter.insertCompanyIntoDb(country, address, url);
         companyInformationScanner.close();
     }
@@ -104,9 +104,9 @@ public class Main {
     private static void insertFilm(int videoID) {
         Scanner companyInformationScanner = new Scanner(System.in);
         System.out.println("Skriv inn lengden til filmen som et heltall: ");
-        int length = stringInputToInteger(companyInformationScanner.next());
+        int length = stringInputToInteger(companyInformationScanner.nextLine());
         System.out.println("Skriv inn utgivelsesåret: ");
-        int releaseYear = stringInputToInteger(companyInformationScanner.next());
+        int releaseYear = stringInputToInteger(companyInformationScanner.nextLine());
         if (length > 0 && releaseYear > 0 && videoID > 0) {
             DBinserter.insertFilmIntoDB(length, releaseYear, videoID);
         }
@@ -116,7 +116,7 @@ public class Main {
     private static void insertPerson() {
         Scanner nameScanner = new Scanner(System.in);
         System.out.println("Skriv inn navnet til personen du vil legge inn: ");
-        String personName = nameScanner.next();
+        String personName = nameScanner.nextLine();
         DBinserter.insertPersonIntoDB(personName);
         nameScanner.close();
     }
@@ -128,22 +128,22 @@ public class Main {
     private static void insertEpisode(int videoID) {
         Scanner episodeInformationScanner = new Scanner(System.in);
         System.out.println("Skriv inn episodenummeret: ");
-        int episodeNr = stringInputToInteger(episodeInformationScanner.next());
+        int episodeNr = stringInputToInteger(episodeInformationScanner.nextLine());
         System.out.println("Skriv inn utgivelsesåret: ");
-        int releaseYear = stringInputToInteger(episodeInformationScanner.next());
+        int releaseYear = stringInputToInteger(episodeInformationScanner.nextLine());
         System.out.println("Skriv inn tittelen på episoden: ");
-        String title = episodeInformationScanner.next();
+        String title = episodeInformationScanner.nextLine();
         System.out.println("Skriv inn sesongnummeret: ");
-        int season = stringInputToInteger(episodeInformationScanner.next());
+        int season = stringInputToInteger(episodeInformationScanner.nextLine());
         System.out.println("Skriv inn en beskrivelse av episoden: ");
-        String description = episodeInformationScanner.next();
+        String description = episodeInformationScanner.nextLine();
         DBinserter.insertEpisodeIntoDB(episodeNr, releaseYear, season, title, description, videoID);
         episodeInformationScanner.close();
     }
 
     // Validates strings containing numbers, integers and underscores
     private static boolean validateStringInput(String s) {
-        return s.matches("^[a-zA-Z0-9_.-]+$");
+        return s.matches("^[a-zA-Z0-9\\s_.-]+$");
     }
 
     // Converts string input to an integer greater than zero
