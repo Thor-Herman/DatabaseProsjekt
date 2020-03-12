@@ -28,8 +28,7 @@ public class Main {
 
     private static void insertMovieorSeriesorEpisode(Scanner scanner) {
         System.out.println("Skriv 'a' for å sette inn en film, 'b' for serie og 'c' for episode");
-        Scanner answerScanner = scanner;
-        String answer = answerScanner.nextLine();
+        String answer = scanner.nextLine();
         if (answer.equals("a")) {
             int videoID = insertVideo(scanner);
             insertFilm(videoID, scanner);
@@ -43,9 +42,8 @@ public class Main {
     }
 
     private static void printActorInfo(String choiceString, Scanner scanner) {
-        Scanner actorScanner = scanner;
         System.out.println("Vennligst skriv inn the fulle navnet til skuespilleren du vil ha info om: ");
-        String actorName = actorScanner.nextLine(); // Tar navn input fra brukeren
+        String actorName = scanner.nextLine(); // Tar navn input fra brukeren
         if (validateStringInput(actorName)) {
             if (choiceString.equals("a")) {
                 System.out.println(actorCtrl.getActorRoles(actorName));
@@ -69,17 +67,16 @@ public class Main {
     }
 
     private static int insertVideo(Scanner scanner) {
-        Scanner videoInformationScanner = scanner;
         System.out.println("Tittel: ");
-        String title = videoInformationScanner.nextLine();
+        String title = scanner.nextLine();
         System.out.println("Beskrivelse: ");
-        String description = videoInformationScanner.nextLine();
+        String description = scanner.nextLine();
         System.out.println("Lanseringsdato: ");
-        String releaseDate = videoInformationScanner.nextLine();
+        String releaseDate = scanner.nextLine();
         System.out.println("Id til selskapet");
-        String companyIDString = videoInformationScanner.nextLine();
+        String companyIDString = scanner.nextLine();
         System.out.println("Skriv inn hva slags type video dette er: ");
-        String videoType = videoInformationScanner.nextLine();
+        String videoType = scanner.nextLine();
         int companyIDInteger = stringInputToInteger(companyIDString);
         if (companyIDInteger > 0) {
             return DBinserter.insertVideoIntoDB(title, description, releaseDate, companyIDInteger, videoType);
@@ -88,31 +85,28 @@ public class Main {
     }
 
     private static void insertCompany(Scanner scanner) {
-        Scanner companyInformationScanner = scanner;
         System.out.println("Skriv inn landet til selskapet: ");
-        String country = companyInformationScanner.nextLine();
+        String country = scanner.nextLine();
         System.out.println("Skriv inn adressem: ");
-        String address = companyInformationScanner.nextLine();
+        String address = scanner.nextLine();
         System.out.println("Skriv inn urlen til nettsiden: ");
-        String url = companyInformationScanner.nextLine();
+        String url = scanner.nextLine();
         DBinserter.insertCompanyIntoDb(country, address, url);
     }
 
     private static void insertFilm(int videoID, Scanner scanner) {
-        Scanner companyInformationScanner = scanner;
         System.out.println("Skriv inn lengden til filmen som et heltall: ");
-        int length = stringInputToInteger(companyInformationScanner.nextLine());
+        int length = stringInputToInteger(scanner.nextLine());
         System.out.println("Skriv inn utgivelsesåret: ");
-        int releaseYear = stringInputToInteger(companyInformationScanner.nextLine());
+        int releaseYear = stringInputToInteger(scanner.nextLine());
         if (length > 0 && releaseYear > 0 && videoID > 0) {
             DBinserter.insertFilmIntoDB(length, releaseYear, videoID);
         }
     }
 
     private static void insertPerson(Scanner scanner) {
-        Scanner nameScanner = scanner;
         System.out.println("Skriv inn navnet til personen du vil legge inn: ");
-        String personName = nameScanner.nextLine();
+        String personName = scanner.nextLine();
         DBinserter.insertPersonIntoDB(personName);
     }
 
@@ -121,17 +115,16 @@ public class Main {
     }
 
     private static void insertEpisode(int videoID, Scanner scanner) {
-        Scanner episodeInformationScanner = scanner;
         System.out.println("Skriv inn episodenummeret: ");
-        int episodeNr = stringInputToInteger(episodeInformationScanner.nextLine());
+        int episodeNr = stringInputToInteger(scanner.nextLine());
         System.out.println("Skriv inn utgivelsesåret: ");
-        int releaseYear = stringInputToInteger(episodeInformationScanner.nextLine());
+        int releaseYear = stringInputToInteger(scanner.nextLine());
         System.out.println("Skriv inn tittelen på episoden: ");
-        String title = episodeInformationScanner.nextLine();
+        String title = scanner.nextLine();
         System.out.println("Skriv inn sesongnummeret: ");
-        int season = stringInputToInteger(episodeInformationScanner.nextLine());
+        int season = stringInputToInteger(scanner.nextLine());
         System.out.println("Skriv inn en beskrivelse av episoden: ");
-        String description = episodeInformationScanner.nextLine();
+        String description = scanner.nextLine();
         DBinserter.insertEpisodeIntoDB(episodeNr, releaseYear, season, title, description, videoID);
     }
 
