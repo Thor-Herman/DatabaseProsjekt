@@ -18,22 +18,20 @@ public class Main {
         while (!inputString.equals("q")) {
             printMenu(lineScanner);
             inputString = lineScanner.nextLine();
-
-            if (inputString.equals("a") || inputString.equals("b")) {
+            if (inputString.equals("a") || inputString.equals("b"))
                 printActorInfo(inputString, lineScanner);
-            }
-            if (inputString.equals("c")) {
+            if (inputString.equals("c"))
                 filmCtrl.printCompaniesMostFilmsPerGenre();
-            }
-            if (inputString.equals("d")) {
+            if (inputString.equals("d"))
                 insertMovieorSeriesorEpisode(lineScanner);
-            }
             if (inputString.equals("e"))
                 main.insertRating(lineScanner);
             if (inputString.equals("f"))
                 main.createUser(lineScanner);
             if (inputString.equals("g"))
                 insertPerson(lineScanner);
+            if (inputString.equals("h"))
+                addRoleToVideo(lineScanner);
         }
         lineScanner.close();
     }
@@ -74,6 +72,9 @@ public class Main {
         System.out.println("c: Finne hvilke filmselskap som lager flest filmer inne hver sjanger ");
         System.out.println("d: Sette inn en ny film ");
         System.out.println("e: Sette inn ny anmeldelse av en episode av en serie ");
+        System.out.println("f: Lage en ny bruker og logg inn");
+        System.out.println("g: Legge til en ny person i databasen");
+        System.out.println("h: Legge til roller i en film");
         System.out.println("q: Exit programmet");
         System.out.println("Skriv inn bokstaven foran det valget du ønsker å ta:  ");
     }
@@ -158,7 +159,7 @@ public class Main {
             }
         }
         else {
-            System.out.println("Register a user first");
+            addRatingToEpisode(scanner);
         }
     }
 
