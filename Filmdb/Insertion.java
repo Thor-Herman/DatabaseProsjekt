@@ -1,3 +1,4 @@
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,6 +25,11 @@ public class Insertion extends FilmDBDriver {
         return id;
     }
 
+    private int getLatestCompanyID() {
+        String idQuery = "SELECT SelskapID FROM Selskap ORDER BY SelskapID DESC LIMIT 1";
+        return executeLatestIDQuery(idQuery, "SelskapID");
+    }
+
     private int getLatestVideoID() {
         String idQuery = "SELECT VideoID FROM Video ORDER BY VideoID DESC LIMIT 1";
         return executeLatestIDQuery(idQuery, "VideoID");
@@ -32,6 +38,22 @@ public class Insertion extends FilmDBDriver {
     private int getLatestPersonID() {
         String idQuery = "SELECT PersonNr FROM Person ORDER BY PersonNr DESC LIMIT 1";
         return executeLatestIDQuery(idQuery, "PersonNr");
+    }
+
+    public int insertCompanyIntoDb(String country, String address, String url) {
+        String insertQuery = "INSERT INTO selskap (Land, Addresse, URL) " +
+                             "VALUES (?, ?, ?)";
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(insertQuery);
+            preparedStatement.setString(1, country);
+            preparedStatement.setString(2, address);
+            preparedStatement.setString(3, url);
+            preparedStatement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return -1;
+        }
+        return getLatestCompanyID();
     }
 
     public int insertVideoIntoDB(String title, String description, String date, int companyID, String videoType) {
@@ -171,11 +193,14 @@ public class Insertion extends FilmDBDriver {
     public static void main(String[] args) {
         Insertion insrt = new Insertion();
         System.out.println(insrt.getLatestPersonID());
+        /*
         insrt.insertVideoIntoDB("The Room", "I did naht hit her", "2004-03-01", 1, "Kino");
         insrt.insertFilmIntoDB(120, 2004, 2);
         insrt.insertPersonIntoDB("Hallvard Trætteberg");
         insrt.addRoleToPerson("Forfatter", 2);
         insrt.addRoleToVideo("forfatter", 2, 1);
+        */
+        insrt.insertCompanyIntoDb("Norge", "Oslo", "www.norskfilm.no");
     }
 
 }
