@@ -200,7 +200,7 @@ public class Insertion extends FilmDBDriver {
         return getLatestUserID();
     }
 
-    public void insertPersonIntoDB(String name) {
+    public int insertPersonIntoDB(String name) {
         String nameQuery = "INSERT INTO Person (Navn) " +
                 "VALUES (?)";
         try {
@@ -209,7 +209,9 @@ public class Insertion extends FilmDBDriver {
             preparedStatement.execute();
         } catch (SQLException e) {
             System.out.println("Db error when inserting person into db");
+            return -1;
         }
+        return getLatestPersonID();
     }
 
     private String determineRoleQuery(String role, boolean isVerb) {
