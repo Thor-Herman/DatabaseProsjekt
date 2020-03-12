@@ -11,15 +11,15 @@ public class FilmCtrl extends FilmDBDriver {
     private ArrayList<String> getCompaniesMostFilmsPerGenre() {
         ArrayList<String> mostFilmsPerGenreList = new ArrayList<>();
         String templateSQL =
-                "SELECT Videotype.Navn, SelskapID, count(VideoID)" +
-                "FROM Videotype NATURAL JOIN Video NATURAL JOIN FILM NATURAL JOIN SELSKAP " +
+                "SELECT Kategori.KategoriNavn, SelskapID, count(VideoID)" +
+                "FROM kategorisert NATURAL JOIN kategori NATURAL JOIN Video NATURAL JOIN FILM NATURAL JOIN SELSKAP " +
                 "GROUP BY SelskapID " +
                 "ORDER BY count(VideoID) DESC " +
                 "LIMIT 1";
         try {
             ResultSet resultSet = connection.createStatement().executeQuery(templateSQL);
             while (resultSet.next()) {
-                String resultRow = resultSet.getString("Navn") + ","
+                String resultRow = resultSet.getString("KategoriNavn") + ","
                         + resultSet.getInt("SelskapID") + ","
                         + resultSet.getInt("count(VideoID)");
                 mostFilmsPerGenreList.add(resultRow);
