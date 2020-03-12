@@ -147,8 +147,30 @@ public class Insertion extends FilmDBDriver {
         createIntQuery(query, videoArray);
     }
 
-    public void addEpisodeToSeries(int episodeNr, int relYear, int season, String title, String descr, int videoID) {
-
+    public void insertEpisodeIntoDB(int episodeNr, int relYear, int season, String title, String descr, int videoID) {
+        if (episodeHasSeries(videoID)) {
+            if (title.equals("")) {
+                System.out.println("Episodes must have a title");
+                return;
+            }
+            String episodeSQL = "INSERT INTO episode (EpisodeNr, UtgÅr, Sesong, Tittel, Beskrivelse, VideoID)" +
+                                "VALUES (?,?,?,?,?,?)";
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(episodeSQL);
+                preparedStatement.setInt(1, episodeNr);
+                preparedStatement.setInt(2, relYear);
+                preparedStatement.setInt(3, season);
+                preparedStatement.setString(4, title);
+                preparedStatement.setString(5, descr);
+                preparedStatement.setInt(6, videoID);
+                preparedStatement.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            System.out.println("There is no series corresponding to the videoID");
+        }
     }
 
     public void insertPersonIntoDB(String name) {
@@ -220,14 +242,15 @@ public class Insertion extends FilmDBDriver {
     public static void main(String[] args) {
         Insertion insrt = new Insertion();
         System.out.println(insrt.getLatestPersonID());
-//        insrt.insertVideoIntoDB("The Room", "I did naht hit her", "2004-03-01", 1, "Kino");
-//        insrt.insertFilmIntoDB(120, 2004, 2);
-//        insrt.insertPersonIntoDB("Hallvard Trætteberg");
-//        insrt.addRoleToPerson("Forfatter", 2);
-//        insrt.addRoleToVideo("forfatter", 2, 1);
-//        insrt.insertCompanyIntoDb("Norge", "Oslo", "www.norskfilm.no");
-//        insrt.insertSeriesIntoDB(2);
+        insrt.insertVideoIntoDB("The Room", "I did naht hit her", "2004-03-01", 1, "Kino");
+        insrt.insertFilmIntoDB(120, 2004, 2);
+        insrt.insertPersonIntoDB("Hallvard Trætteberg");
+        insrt.addRoleToPerson("Forfatter", 2);
+        insrt.addRoleToVideo("forfatter", 2, 1);
+        insrt.insertCompanyIntoDb("Norge", "Oslo", "www.norskfilm.no");
+        insrt.insertSeriesIntoDB(2);
         System.out.println(insrt.episodeHasSeries(2));
+        insrt.insertEpisodeIntoDB(1, 2005, 1, "Tommy returns", "Hallo", 2);
     }
 
 }
