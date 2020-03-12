@@ -21,25 +21,25 @@ public class Main {
                 filmCtrl.printCompaniesMostFilmsPerGenre();
             }
             if (inputString.equals("d")) {
-                insertMovieorSeries();
+                insertMovieorSeriesorEpisode();
             }
             lineScanner.close();
         }
-
-
-
     }
 
-    private static void insertMovieorSeries() {
-        System.out.println("Skriv 'a' for å sette inn en film og 'b' for serie");
+    private static void insertMovieorSeriesorEpisode() {
+        System.out.println("Skriv 'a' for å sette inn en film, 'b' for serie og 'c' for episode");
         Scanner answerScanner = new Scanner(System.in);
         String answer = answerScanner.next();
         if (answer.equals("a")) {
-            insertVideo();
-            insertFilm();
+            int videoID = insertVideo();
+            insertFilm(videoID);
         } else if (answer.equals("b")) {
-            insertVideo();
-            insertSeries();
+            int videoID = insertVideo();
+            insertSeries(videoID);
+        } else if (answer.equals("c")) {
+            int videoID = insertVideo();
+            insertEpisode(videoID);
         }
     }
 
@@ -125,7 +125,7 @@ public class Main {
         DBinserter.insertSeriesIntoDB(videoID);
     }
 
-    private static void insertEpisode() {
+    private static void insertEpisode(int videoID) {
         Scanner episodeInformationScanner = new Scanner(System.in);
         System.out.println("Skriv inn episodenummeret: ");
         int episodeNr = stringInputToInteger(episodeInformationScanner.next());
@@ -137,8 +137,6 @@ public class Main {
         int season = stringInputToInteger(episodeInformationScanner.next());
         System.out.println("Skriv inn en beskrivelse av episoden: ");
         String description = episodeInformationScanner.next();
-        System.out.println("Skriv inn videoID");
-        int videoID = stringInputToInteger(episodeInformationScanner.next());
         DBinserter.insertEpisodeIntoDB(episodeNr, releaseYear, season, title, description, videoID);
         episodeInformationScanner.close();
     }
