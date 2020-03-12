@@ -231,7 +231,7 @@ public class Insertion extends FilmDBDriver {
                 break;
             case "skuespiller":
                 if (isVerb)
-                    roleQuery = "INSERT INTO spilleri VALUES(?,?)";
+                    roleQuery = "INSERT INTO spilleri VALUES(?,?,?)";
                 else
                     roleQuery = "INSERT INTO skuespiller VALUES(?)";
                 break;
@@ -254,7 +254,7 @@ public class Insertion extends FilmDBDriver {
         }
     }
 
-    public void addRoleToVideo(String role, int personNr, int videoID) {
+    public void addRoleToVideo(String role, int personNr, int videoID, String skuespillerRolle) {
         if (Arrays.stream(acceptableRoles).noneMatch(
                 acceptableRoleVerb -> acceptableRoleVerb.toLowerCase().equals(role.toLowerCase()))) {
             System.out.println(role + " is not an acceptable roleVerb");
@@ -264,8 +264,21 @@ public class Insertion extends FilmDBDriver {
             System.out.println("Added role " + role + " to this person");
         }
         String roleQuery = determineRoleQuery(role, true);
-        int[] foreignKeys = {personNr, videoID};
-        createIntQuery(roleQuery, foreignKeys);
+        if (role.equals("skuespiller")) {
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(roleQuery);
+                preparedStatement.setInt(1, personNr);
+                preparedStatement.setInt(2, videoID);
+                preparedStatement.setString(3, skuespillerRolle);
+                preparedStatement.execute();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            int[] foreignKeys = {personNr, videoID};
+            createIntQuery(roleQuery, foreignKeys);
+        }
     }
 
     public void addRatingToEpisode(int userID, int episodeID, int rating) {
